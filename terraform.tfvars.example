@@ -1,0 +1,61 @@
+#######################
+# Redis Cloud Authentication
+#######################
+# Get these from Redis Cloud Console → Access Management → API Keys
+redis_global_api_key    = "your-api-account-key-here"
+redis_global_secret_key = "your-secret-key-here"
+
+#######################
+# Subscription Configuration
+#######################
+subscription_name            = "redis-cloud-subscription"
+cloud_account_id             = "1"  # Use "1" for Redis-managed, or your cloud account ID for BYOC
+region                       = "us-east-1"
+networking_deployment_cidr   = "10.0.0.0/24"  # Must be /24 and not overlap with your VPC
+preferred_availability_zones = []  # Leave empty for automatic selection
+
+#######################
+# Database Configuration
+#######################
+database_name                           = "redis-db"
+user_password                           = ""  # Leave empty for auto-generated
+dataset_size_in_gb                      = 1
+throughput_measurement_by               = "operations-per-second"
+throughput_measurement_value            = 10000
+replication                             = true
+enable_tls                              = false
+data_persistence                        = "aof-every-1-second"
+data_eviction                           = "volatile-lru"
+support_oss_cluster_api                 = false
+external_endpoint_for_oss_cluster_api   = false
+
+#######################
+# PrivateLink Configuration
+#######################
+enable_privatelink      = true
+private_link_share_name = "redis-cloud-privatelink"
+
+# AWS principals that can access the PrivateLink
+private_link_principals = [
+  {
+    principal       = "123456789012"  # Your AWS Account ID
+    principal_type  = "aws_account"
+    principal_alias = "my-aws-account"
+  }
+]
+
+#######################
+# Alerts Configuration
+#######################
+dataset_size_alert_percentage = 80
+throughput_alert_percentage   = 80
+
+#######################
+# Tags
+#######################
+tags = {
+  Environment = "production"
+  ManagedBy   = "terraform"
+  Project     = "elasticache-migration"
+}
+
