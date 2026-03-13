@@ -93,5 +93,4 @@ Atualize o endpoint na sua aplicação e faça deploy gradual (blue/green).
 | **Features** | Básico | JSON, Search, TimeSeries, Bloom |
 | **Multi-cloud** | ❌ | ✅ AWS, GCP, Azure |
 | **Suporte** | AWS (lento) | Redis experts 24/7 |
-| **Custo** | $150/mês | $120/mês (-20%) |
 
