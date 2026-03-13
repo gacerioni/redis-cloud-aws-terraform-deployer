@@ -185,3 +185,37 @@ variable "tags" {
   }
 }
 
+#######################
+# AWS VPC Endpoint Configuration (Optional)
+#######################
+
+variable "create_aws_vpc_endpoint" {
+  description = "Create AWS VPC Endpoint automatically for PrivateLink connectivity"
+  type        = bool
+  default     = false
+}
+
+variable "aws_vpc_id" {
+  description = "AWS VPC ID where the VPC Endpoint will be created (required if create_aws_vpc_endpoint = true)"
+  type        = string
+  default     = ""
+}
+
+variable "aws_subnet_ids" {
+  description = "AWS Subnet IDs for the VPC Endpoint (required if create_aws_vpc_endpoint = true)"
+  type        = list(string)
+  default     = []
+}
+
+variable "aws_security_group_ids" {
+  description = "Existing AWS Security Group IDs to attach to VPC Endpoint (optional, will create one if empty)"
+  type        = list(string)
+  default     = []
+}
+
+variable "aws_allowed_cidr_blocks" {
+  description = "CIDR blocks allowed to access Redis through the VPC Endpoint (used if creating security group)"
+  type        = list(string)
+  default     = []
+}
+

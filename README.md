@@ -8,8 +8,22 @@ This Terraform configuration deploys:
 - **Redis Cloud Subscription** on AWS
 - **Redis Database** with configurable sizing and HA
 - **AWS PrivateLink** for secure private connectivity
+- **AWS VPC Endpoint** (optional) - full automation with one command!
 
 Perfect for migrating from AWS ElastiCache to Redis Cloud.
+
+### ✨ Two Deployment Modes
+
+**Mode 1: Redis Cloud Only** (default)
+- Creates Redis Cloud resources
+- You manually create AWS VPC Endpoint
+
+**Mode 2: Full Automation** (set `create_aws_vpc_endpoint = true`)
+- Creates Redis Cloud resources
+- **Automatically creates AWS VPC Endpoint**
+- **Configures Security Groups**
+- **Enables DNS resolution**
+- **One `terraform apply` and you're done!** 🚀
 
 ## 📋 Prerequisites
 
@@ -110,6 +124,9 @@ After `terraform apply`, complete the AWS side:
 
 ## 📚 Documentation
 
+- [Architecture Overview](ARCHITECTURE.md) - Detailed architecture and design decisions
+- [Migration Playbook](MIGRATION_PLAYBOOK.md) - Step-by-step migration guide from ElastiCache
+- [Troubleshooting](TROUBLESHOOTING.md) - Common issues and solutions
 - [Redis Cloud Terraform Provider](https://registry.terraform.io/providers/RedisLabs/rediscloud/latest/docs)
 - [Redis Cloud PrivateLink](https://docs.redis.com/latest/rc/security/vpc-peering/)
 - [AWS PrivateLink](https://docs.aws.amazon.com/vpc/latest/privatelink/)

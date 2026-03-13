@@ -47,6 +47,62 @@ output "database_password" {
   sensitive   = true
 }
 
+output "database_private_endpoint_host" {
+  description = "Private endpoint hostname (without port)"
+  value       = var.enable_privatelink ? try(split(":", rediscloud_subscription_database.database.private_endpoint)[0], null) : null
+}
+
+output "redis_connection_info" {
+  description = "Redis connection information (non-sensitive)"
+  value = {
+    host     = var.enable_privatelink ? try(split(":", rediscloud_subscription_database.database.private_endpoint)[0], rediscloud_subscription_database.database.public_endpoint) : rediscloud_subscription_database.database.public_endpoint
+    port     = try(rediscloud_subscription_database.database.port, null)
+    endpoint = var.enable_privatelink ? rediscloud_subscription_database.database.private_endpoint : rediscloud_subscription_database.database.public_endpoint
+  }
+}
+
+output "connection_summary" {
+  description = "📋 Complete connection summary (copy-paste ready!)"
+  value = <<-EOT
+
+  ╔════════════════════════════════════════════════════════════════════════════╗
+  ║                    🎉 REDIS CLOUD CONNECTION INFO                          ║
+  ╚════════════════════════════════════════════════════════════════════════════╝
+
+  📍 ENDPOINT DETAILS:
+  ────────────────────────────────────────────────────────────────────────────
+  Host:     ${coalesce(try(var.enable_privatelink ? try(split(":", rediscloud_subscription_database.database.private_endpoint)[0], null) : try(split(":", rediscloud_subscription_database.database.public_endpoint)[0], null), null), "N/A")}
+  Port:     ${coalesce(try(tostring(rediscloud_subscription_database.database.port), null), "N/A")}
+  Endpoint: ${coalesce(try(var.enable_privatelink ? rediscloud_subscription_database.database.private_endpoint : rediscloud_subscription_database.database.public_endpoint, null), "N/A")}
+
+  🔐 AUTHENTICATION:
+  ────────────────────────────────────────────────────────────────────────────
+  Password: Run 'terraform output -raw database_password' to get password
+
+  ${var.create_aws_vpc_endpoint ? "🔗 AWS VPC ENDPOINT:\n  ────────────────────────────────────────────────────────────────────────────\n  VPC Endpoint ID: ${coalesce(try(aws_vpc_endpoint.redis_cloud[0].id, null), "N/A")}\n  Status:          ${coalesce(try(aws_vpc_endpoint.redis_cloud[0].state, null), "N/A")}\n  RAM Share:       ${coalesce(try(aws_ram_resource_share_accepter.redis_cloud[0].status, null), "N/A")}\n  " : ""}
+  🧪 TEST CONNECTION:
+  ────────────────────────────────────────────────────────────────────────────
+  redis-cli -h ${coalesce(try(var.enable_privatelink ? try(split(":", rediscloud_subscription_database.database.private_endpoint)[0], null) : try(split(":", rediscloud_subscription_database.database.public_endpoint)[0], null), null), "N/A")} \
+            -p ${coalesce(try(tostring(rediscloud_subscription_database.database.port), null), "N/A")} \
+            -a $(terraform output -raw database_password) \
+            ping
+
+  📊 DATABASE INFO:
+  ────────────────────────────────────────────────────────────────────────────
+  Database ID:   ${coalesce(try(tostring(rediscloud_subscription_database.database.db_id), null), "N/A")}
+  Database Name: ${var.database_name}
+  Memory:        ${var.dataset_size_in_gb} GB
+  Throughput:    ${var.throughput_measurement_value} ${var.throughput_measurement_by}
+  HA Enabled:    ${var.replication}
+  TLS Enabled:   ${var.enable_tls}
+
+  ╔════════════════════════════════════════════════════════════════════════════╗
+  ║  💡 TIP: Use 'terraform output -raw database_password' to get password    ║
+  ╚════════════════════════════════════════════════════════════════════════════╝
+
+  EOT
+}
+
 #######################
 # PrivateLink Outputs
 #######################
@@ -74,6 +130,35 @@ output "privatelink_connections" {
 output "privatelink_databases" {
   description = "PrivateLink databases"
   value       = var.enable_privatelink ? try(rediscloud_private_link.private_link[0].databases, []) : []
+}
+
+#######################
+# AWS VPC Lattice Outputs
+#######################
+
+output "aws_ram_share_status" {
+  description = "AWS RAM Resource Share acceptance status (if created)"
+  value       = var.create_aws_vpc_endpoint ? try(aws_ram_resource_share_accepter.redis_cloud[0].status, null) : null
+}
+
+output "aws_vpc_endpoint_id" {
+  description = "AWS VPC Endpoint ID for Lattice Resource Configuration (if created)"
+  value       = var.create_aws_vpc_endpoint ? try(aws_vpc_endpoint.redis_cloud[0].id, null) : null
+}
+
+output "aws_vpc_endpoint_state" {
+  description = "AWS VPC Endpoint state (if created)"
+  value       = var.create_aws_vpc_endpoint ? try(aws_vpc_endpoint.redis_cloud[0].state, null) : null
+}
+
+output "aws_vpc_endpoint_dns_entries" {
+  description = "AWS VPC Endpoint DNS entries (if created)"
+  value       = var.create_aws_vpc_endpoint ? try(aws_vpc_endpoint.redis_cloud[0].dns_entry, []) : []
+}
+
+output "aws_security_group_id" {
+  description = "AWS Security Group ID for VPC Lattice (if created)"
+  value       = local.create_security_group ? try(aws_security_group.redis_vpc_endpoint[0].id, null) : null
 }
 
 #######################

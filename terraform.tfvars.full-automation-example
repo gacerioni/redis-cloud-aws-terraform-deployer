@@ -1,0 +1,88 @@
+#######################
+# FULL AUTOMATION EXAMPLE
+#######################
+# This example shows how to deploy Redis Cloud + AWS VPC Endpoint
+# with a single "terraform apply" command!
+
+#######################
+# Redis Cloud Authentication
+#######################
+redis_global_api_key    = "your-api-key-here"
+redis_global_secret_key = "your-secret-key-here"
+
+#######################
+# Subscription Configuration
+#######################
+subscription_name            = "elasticache-migration"
+cloud_account_id             = "1"
+region                       = "us-east-1"
+networking_deployment_cidr   = "10.123.42.0/24"
+preferred_availability_zones = []
+
+#######################
+# Database Configuration
+#######################
+database_name                           = "elasticache-migration-db"
+user_password                           = ""
+dataset_size_in_gb                      = 1
+throughput_measurement_by               = "operations-per-second"
+throughput_measurement_value            = 1000
+replication                             = true
+enable_tls                              = false
+data_persistence                        = "aof-every-1-second"
+data_eviction                           = "volatile-lru"
+support_oss_cluster_api                 = false
+external_endpoint_for_oss_cluster_api   = false
+
+#######################
+# PrivateLink Configuration
+#######################
+enable_privatelink      = true
+private_link_share_name = "gabs-aws-summit-pl"
+
+private_link_principals = [
+  {
+    principal       = "735486936198"
+    principal_type  = "aws_account"
+    principal_alias = "workshop-account-gabs"
+  }
+]
+
+#######################
+# Alerts Configuration
+#######################
+dataset_size_alert_percentage = 80
+throughput_alert_percentage   = 80
+
+#######################
+# Tags
+#######################
+tags = {
+  Environment = "demo"
+  ManagedBy   = "terraform"
+  Project     = "elasticache-migration"
+  Owner       = "gabs"
+}
+
+#######################
+# 🚀 AWS VPC Endpoint - FULL AUTOMATION!
+#######################
+# Set this to true for one-command deployment
+create_aws_vpc_endpoint = true
+
+# Your AWS VPC details
+aws_vpc_id     = "vpc-0123456789abcdef0"      # Replace with your VPC ID
+aws_subnet_ids = [
+  "subnet-0123456789abcdef0",                  # Replace with your subnet IDs
+  "subnet-0123456789abcdef1"
+]
+
+# CIDR blocks allowed to access Redis
+# This will be used to create Security Group rules
+aws_allowed_cidr_blocks = [
+  "10.0.0.0/16"  # Your VPC CIDR - adjust as needed
+]
+
+# Optional: Use existing security groups instead of creating new one
+# aws_security_group_ids = ["sg-0123456789abcdef0"]
+
