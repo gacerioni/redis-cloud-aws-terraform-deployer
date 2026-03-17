@@ -1,11 +1,22 @@
 # Playbook de Migração: AWS ElastiCache para Redis Cloud
 
-## 🎯 TL;DR
+## 📋 Premissas
 
-**Tempo:** 15 minutos | **Downtime:** Zero | **Comandos:** 1 (com automação completa)
+Esta migração assume:
+1. **Sem Multi-Tenancy** (um redis database por subscription)
+2. **Dados voláteis** (cache que pode ser reconstruído)
+3. **Zero downtime** (migração gradual com blue/green deployment)
 
-Migrar para Valkey = 1 clique. Migrar para Redis Cloud = 1 comando Terraform.
-**Mesmo esforço. Resultado completamente diferente.**
+---
+
+## Estimativa de Esforço
+
+| Etapa | Descrição | Duração |
+|-------|-----------|---------|
+| 1. Configuração | Editar `terraform.tfvars` | 2 minutos |
+| 2. Deploy | `terraform apply` | 15 minutos |
+| 3. Atualizar App | Atualizar endpoint na app | 3 minutos |
+| **Total** |  | **20 minutos** |
 
 ---
 
@@ -22,7 +33,7 @@ terraform apply
 
 ---
 
-## 🚀 Migração em 4 Passos (Modo Manual)
+## 🚀 Migração em 3 Passos
 
 ### 1️⃣ Configure (2 minutos)
 
@@ -60,21 +71,7 @@ terraform init
 terraform apply
 ```
 
-### 3️⃣ Configure VPC Endpoint (5 minutos ou 0 se usou automação)
-
-**Se `create_aws_vpc_endpoint = true`:** Pule este passo! Já está pronto. ✅
-
-**Se `create_aws_vpc_endpoint = false`:**
-
-```bash
-# Pegue o ARN do PrivateLink
-terraform output privatelink_resource_configuration_arn
-```
-
-**AWS Console** → **VPC** → **Endpoints** → **Create endpoint**
-Cole o ARN, selecione sua VPC e subnets. Pronto.
-
-### 4️⃣ Atualize sua App (5 minutos)
+### 3️⃣ Atualize sua App (5 minutos)
 
 ```bash
 # Pegue a connection string
@@ -84,13 +81,3 @@ terraform output redis_connection_string
 Atualize o endpoint na sua aplicação e faça deploy gradual (blue/green).
 
 ---
-
-## 🎁 Por Que Redis Cloud?
-
-| | Valkey (fork) | Redis Cloud |
-|---|---|---|
-| **Versão** | Fork congelado | Redis oficial sempre atualizado |
-| **Features** | Básico | JSON, Search, TimeSeries, Bloom |
-| **Multi-cloud** | ❌ | ✅ AWS, GCP, Azure |
-| **Suporte** | AWS (lento) | Redis experts 24/7 |
-
