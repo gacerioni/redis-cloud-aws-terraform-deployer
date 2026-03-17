@@ -35,7 +35,7 @@ terraform apply
 
 ## 🚀 Migração em 3 Passos
 
-### 1️⃣ Configure (2 minutos)
+### 1️⃣ Configure
 
 Edite `terraform.tfvars` com suas credenciais e configuração:
 
@@ -64,14 +64,14 @@ aws_subnet_ids          = ["subnet-xxxxx", "subnet-yyyyy"]
 aws_allowed_cidr_blocks = ["10.0.0.0/16"]
 ```
 
-### 2️⃣ Deploy (3 minutos)
+### 2️⃣ Deploy
 
 ```bash
 terraform init
 terraform apply
 ```
 
-### 3️⃣ Atualize sua App (5 minutos)
+### 3️⃣ Atualize sua App
 
 ```bash
 # Pegue a connection string
